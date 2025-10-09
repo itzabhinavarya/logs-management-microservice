@@ -1,0 +1,36 @@
+{
+  "name": "enterprise-microservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:api": "pnpm --filter api start:dev",
+    "dev:logger": "pnpm --filter logger start:dev",
+    "dev:gateway": "pnpm --filter gateway start:dev",
+    "dev:all": "concurrently \"pnpm dev:api\" \"pnpm dev:logger\" \"pnpm dev:gateway\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.18.1",
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.10",
+    "@types/node": "^22.18.8",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.17.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
+    "@prisma/client": "^6.17.0",
+    "axios": "^1.12.2",
+    "winston": "^3.18.3",
+    "concurrently": "^9.0.0"
+  }
+}
