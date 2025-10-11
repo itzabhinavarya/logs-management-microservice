@@ -280,34 +280,79 @@ Before you begin, ensure you have the following installed:
 
 ## Installation
 
-### 1. Clone the Repository
+### Quick Install (Recommended)
+
+**One command installs everything for all services:**
 
 ```bash
+# Clone repository
 git clone <repository-url>
 cd enterprise-microservice
-```
 
-### 2. Install Dependencies
-
-Using PNPM (recommended):
-```bash
+# Install all dependencies (root + all services)
 pnpm install
 ```
 
-This will install all dependencies for the root workspace and all microservices.
+That's it! PNPM workspaces automatically:
+- ✅ Installs root dependencies
+- ✅ Installs dependencies for API service
+- ✅ Installs dependencies for Gateway service  
+- ✅ Installs dependencies for Logger service
+- ✅ Hoists common packages to save disk space
+- ✅ Generates Prisma client automatically (postinstall hook)
 
-### 3. Verify Installation
+### How It Works
 
-Check that all services have their dependencies installed:
+PNPM workspaces read the `pnpm-workspace.yaml` file which defines:
+
+```yaml
+packages:
+  - "apps/*"    # All services in apps directory
+  - "libs/*"    # All shared libraries (future)
+```
+
+When you run `pnpm install` at the root:
+
+1. **Shared dependencies** (in root `package.json`) are installed once and used by all services
+2. **Service-specific dependencies** are installed only where needed
+3. **Symlinks** connect everything efficiently
+
+### Manual Installation (Alternative)
+
+If you prefer to install each service separately:
+
 ```bash
-# Check API service
-cd apps/api && pnpm list
+# Install root dependencies
+pnpm install
 
-# Check Gateway service
-cd apps/gateway && pnpm list
+# Install each service
+cd apps/api && pnpm install
+cd apps/gateway && pnpm install
+cd apps/logger && pnpm install
+```
 
-# Check Logger service
-cd apps/logger && pnpm list
+**Note:** This is not recommended as PNPM workspaces handle this automatically and more efficiently.
+
+### Verify Installation
+
+```bash
+# Check all packages installed
+pnpm list -r
+
+# Verify builds work
+pnpm run build
+
+# Check for issues
+pnpm run lint
+```
+
+### Clean Install
+
+If you encounter issues:
+
+```bash
+# Remove all node_modules and reinstall
+pnpm run clean:install
 ```
 
 ---
@@ -720,6 +765,100 @@ All logs are stored in JSON format with timestamps:
 
 ---
 
+## Dependency Management
+
+### Understanding the Monorepo Structure
+
+This project uses **PNPM Workspaces** for efficient dependency management across all services.
+
+#### Key Files
+
+1. **`pnpm-workspace.yaml`** - Defines which directories are workspaces
+2. **`.npmrc`** - PNPM configuration (hoisting, peer dependencies, etc.)
+3. **Root `package.json`** - Shared dependencies used by all services
+4. **Service `package.json`** - Service-specific dependencies
+
+### Adding Dependencies
+
+#### Add to All Services (Shared Dependencies)
+
+```bash
+# Add shared dependency at root level
+pnpm add <package-name> -w
+
+# Example: Add a shared utility library
+pnpm add lodash -w
+
+# Add shared dev dependency
+pnpm add -D <package-name> -w
+```
+
+**When to use:** When ALL services need the same package (e.g., `@nestjs/common`, `typescript`)
+
+#### Add to Specific Service
+
+```bash
+# Add to API service only
+pnpm --filter api add <package-name>
+
+# Add to Gateway service only
+pnpm --filter gateway add <package-name>
+
+# Add to Logger service only
+pnpm --filter logger add <package-name>
+
+# Example: Add Prisma only to API service
+pnpm --filter api add @prisma/client
+```
+
+**When to use:** When only ONE service needs the package (e.g., `prisma` for API, `http-proxy-middleware` for Gateway)
+
+### Removing Dependencies
+
+```bash
+# Remove from root
+pnpm remove <package-name> -w
+
+# Remove from specific service
+pnpm --filter api remove <package-name>
+```
+
+### Updating Dependencies
+
+```bash
+# Update all dependencies in all workspaces
+pnpm update -r
+
+# Update specific package everywhere
+pnpm update <package-name> -r
+
+# Interactive update
+pnpm update --interactive --latest -r
+```
+
+### Best Practices
+
+1. **Keep root clean**: Only add truly shared dependencies to root
+2. **Service isolation**: Each service should be independently installable
+3. **Version consistency**: Use same versions across services when possible
+4. **Lock file**: Always commit `pnpm-lock.yaml`
+5. **Peer dependencies**: Let PNPM auto-install peers (configured in `.npmrc`)
+
+### Dependency Audit
+
+```bash
+# Check for vulnerabilities
+pnpm audit
+
+# Fix vulnerabilities
+pnpm audit --fix
+
+# List outdated packages
+pnpm outdated -r
+```
+
+---
+
 ## Development Workflow
 
 ### Project Structure Guidelines
@@ -815,13 +954,37 @@ cd apps/api && pnpm run test:cov
 
 ### Root Level Scripts
 
-| Script | Description |
-|--------|-------------|
-| `pnpm run dev:api` | Start API service in development mode |
-| `pnpm run dev:logger` | Start Logger service in development mode |
-| `pnpm run dev:gateway` | Start Gateway service in development mode |
-| `pnpm run dev:all` | Start all services concurrently |
-| `pnpm test` | Run tests |
+| Script | Command | Description |
+|--------|---------|-------------|
+| **Installation** |
+| `pnpm install` | `pnpm install` | Install all dependencies (root + all services) |
+| `pnpm run install:all` | `pnpm install` | Same as above (explicit) |
+| `pnpm run clean` | `pnpm -r exec rm -rf node_modules dist` | Remove all node_modules and dist folders |
+| `pnpm run clean:install` | Clean + install | Fresh installation |
+| **Development** |
+| `pnpm run dev:api` | Start API service | Run API in development mode (port 4000) |
+| `pnpm run dev:logger` | Start Logger service | Run Logger in development mode (port 4001) |
+| `pnpm run dev:gateway` | Start Gateway service | Run Gateway in development mode (port 3000) |
+| `pnpm run dev:all` | Start all services | Run all services concurrently with colored output |
+| **Production** |
+| `pnpm run build` | Build all services | Compile all services to JavaScript |
+| `pnpm run build:api` | Build API service | Build API only |
+| `pnpm run build:gateway` | Build Gateway service | Build Gateway only |
+| `pnpm run build:logger` | Build Logger service | Build Logger only |
+| `pnpm run start:all` | Start all (prod) | Run all services in production mode |
+| **Database** |
+| `pnpm run db:generate` | Generate Prisma client | Generate TypeScript types from schema |
+| `pnpm run db:migrate` | Run migrations | Create/update database schema |
+| `pnpm run db:studio` | Open Prisma Studio | Visual database editor |
+| `pnpm run db:push` | Push schema | Push schema changes without migration |
+| `pnpm run db:reset` | Reset database | ⚠️ Drops and recreates database |
+| **Code Quality** |
+| `pnpm run lint` | Lint all services | Run ESLint on all services |
+| `pnpm run lint:fix` | Fix linting issues | Auto-fix ESLint issues |
+| `pnpm run format` | Format code | Run Prettier on all services |
+| `pnpm run test` | Run all tests | Execute tests for all services |
+| `pnpm run test:watch` | Run tests (watch) | Run tests in watch mode |
+| `pnpm run test:cov` | Test coverage | Generate coverage reports |
 
 ### API Service Scripts
 
