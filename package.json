@@ -5,6 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
+    "install:all": "pnpm install",
     "clean": "pnpm -r exec rm -rf node_modules dist",
     "clean:install": "pnpm run clean && pnpm install",
     "build": "pnpm -r --filter './apps/*' run build",
