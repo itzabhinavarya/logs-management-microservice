@@ -20,6 +20,9 @@ apps/logger/.turbo
 dist/
 build/
 
+# Turborepo
+.turbo
+
 # Environment variables
 .env
 .env.*
