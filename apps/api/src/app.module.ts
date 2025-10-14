@@ -4,9 +4,16 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { LoggerModule } from './infrastructure/logger.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, PrismaModule, LoggerModule], // LoggerModule available globally
+  imports: [ConfigModule.forRoot({
+    envFilePath: "../../../.env",
+  }),
+    PrismaModule,
+    UserModule,
+    LoggerModule
+  ], // LoggerModule available globally
   controllers: [AppController],
   providers: [AppService],
 })

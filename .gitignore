@@ -4,18 +4,24 @@ node_modules/
 apps/api/node_modules/
 apps/api/dist/
 apps/api/.env
+apps/api/.turbo
 
 apps/gateway/node_modules/
 apps/gateway/dist/
 apps/gateway/.env
+apps/gateway/.turbo
 
 apps/logger/node_modules/
 apps/logger/dist/
 apps/logger/.env
+apps/logger/.turbo
 
 # Build outputs
 dist/
 build/
+
+# Turborepo
+.turbo
 
 # Environment variables
 .env

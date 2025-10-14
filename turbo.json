@@ -1,0 +1,123 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "build/**", "out/**"],
+      "inputs": ["src/**", "prisma/**", "tsconfig*.json", "nest-cli.json", "package.json"],
+      "cache": true
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
+    },
+    "start:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "start:prod": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
+    },
+    "start:debug": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "test/**", "eslint.config.*", ".eslintrc*"],
+      "outputs": [],
+      "cache": true
+    },
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "test/**", "eslint.config.*", ".eslintrc*"],
+      "outputs": ["src/**", "test/**"],
+      "cache": false
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "test/**", "jest.config.*", "tsconfig*.json"],
+      "outputs": ["coverage/**"],
+      "cache": true
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:cov": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "test/**", "jest.config.*", "tsconfig*.json"],
+      "outputs": ["coverage/**"],
+      "cache": true
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "test/**", "jest.config.*", "tsconfig*.json"],
+      "outputs": [],
+      "cache": true
+    },
+    "test:debug": {
+      "cache": false,
+      "persistent": true
+    },
+    "format": {
+      "inputs": ["src/**", "test/**", ".prettierrc*", "prettier.config.*"],
+      "outputs": ["src/**", "test/**"],
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    },
+    "db:generate": {
+      "inputs": ["prisma/schema.prisma"],
+      "outputs": ["node_modules/@prisma/client/**"],
+      "cache": true
+    },
+    "db:migrate": {
+      "dependsOn": ["db:generate"],
+      "inputs": ["prisma/schema.prisma", "prisma/migrations/**"],
+      "outputs": ["prisma/migrations/**"],
+      "cache": false
+    },
+    "db:push": {
+      "dependsOn": ["db:generate"],
+      "inputs": ["prisma/schema.prisma"],
+      "outputs": [],
+      "cache": false
+    },
+    "db:studio": {
+      "cache": false,
+      "persistent": true
+    },
+    "db:reset": {
+      "cache": false
+    }
+  },
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "DATABASE_URL",
+    "API_URL",
+    "GATEWAY_URL",
+    "LOGGER_URL",
+    "API_PORT",
+    "GATEWAY_PORT",
+    "LOGGER_PORT"
+  ],
+  "globalDependencies": [
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "turbo.json",
+    ".env*"
+  ]
+}
+
