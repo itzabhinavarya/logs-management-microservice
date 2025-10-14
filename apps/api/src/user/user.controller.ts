@@ -13,6 +13,7 @@ export class UserController {
         this.loggerClient.log('Fetching all users', 'info');
         const records = await this.userServices.getAllUsers()
         this.loggerClient.log(`Successfully fetched ${records.length} users`, 'info');
+        // await readLogs()
         return {
             status: true,
             message: "User fetched successfully",

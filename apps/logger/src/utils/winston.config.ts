@@ -14,13 +14,14 @@ export const logger = createLogger({
         new transports.File({ filename: path.join(logDir, 'error.log'), level: 'error' }),
         new transports.File({ filename: path.join(logDir, 'combined.log') }),
         new transports.Console(),
+        // @ts-ignore
         new WinstonCloudWatch({
             logGroupName: '/microservices/logger',
             logStreamName: `logger-dev`,
-            awsRegion: process.env.AWS_REGION || 'ap-south-1',
+            awsRegion: 'ap-south-1',
             jsonMessage: true,
-            awsSecretKey: process.env.AWS_SECRET_KEY || '1',
-            awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID || '1',
+            awsSecretKey: 'test',      // dummy for LocalStack
+            awsAccessKeyId: 'test',    // dummy for LocalStack
         }),
     ],
 });
