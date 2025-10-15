@@ -14,14 +14,21 @@ export const logger = createLogger({
         new transports.File({ filename: path.join(logDir, 'error.log'), level: 'error' }),
         new transports.File({ filename: path.join(logDir, 'combined.log') }),
         new transports.Console(),
-        // @ts-ignore
         new WinstonCloudWatch({
             logGroupName: '/microservices/logger',
-            logStreamName: `logger-dev`,
+            logStreamName: `logger-dev`, // Make it unique
             awsRegion: 'ap-south-1',
             jsonMessage: true,
-            awsSecretKey: 'test',      // dummy for LocalStack
-            awsAccessKeyId: 'test',    // dummy for LocalStack
+            awsAccessKeyId: 'test',
+            awsSecretKey: 'test',
+            // Add these LocalStack-specific options:
+            awsOptions: {
+                endpoint: 'http://localhost:4566', // LocalStack endpoint
+                credentials: {
+                    accessKeyId: 'test',
+                    secretAccessKey: 'test',
+                }
+            }
         }),
     ],
 });
