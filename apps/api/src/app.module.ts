@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { LoggerModule } from './infrastructure/logger.module';
 import { ConfigModule } from '@nestjs/config';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -12,7 +13,8 @@ import { ConfigModule } from '@nestjs/config';
   }),
     PrismaModule,
     UserModule,
-    LoggerModule
+    LoggerModule,
+    ProjectModule
   ], // LoggerModule available globally
   controllers: [AppController],
   providers: [AppService],

@@ -1,15 +1,30 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "ui": "tui",
+  "ui":"tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "build/**", "out/**"],
-      "inputs": ["src/**", "prisma/**", "tsconfig*.json", "nest-cli.json", "package.json"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "build/**",
+        "out/**"
+      ],
+      "inputs": [
+        "src/**",
+        "prisma/**",
+        "tsconfig*.json",
+        "nest-cli.json",
+        "package.json"
+      ],
       "cache": true
     },
     "start": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
       "persistent": true
     },
@@ -18,7 +33,9 @@
       "persistent": true
     },
     "start:prod": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false,
       "persistent": true
     },
@@ -31,21 +48,47 @@
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "eslint.config.*", ".eslintrc*"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "eslint.config.*",
+        ".eslintrc*"
+      ],
       "outputs": [],
       "cache": true
     },
     "lint:fix": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "eslint.config.*", ".eslintrc*"],
-      "outputs": ["src/**", "test/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "eslint.config.*",
+        ".eslintrc*"
+      ],
+      "outputs": [
+        "src/**",
+        "test/**"
+      ],
       "cache": false
     },
     "test": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "jest.config.*", "tsconfig*.json"],
-      "outputs": ["coverage/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "jest.config.*",
+        "tsconfig*.json"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
       "cache": true
     },
     "test:watch": {
@@ -53,14 +96,30 @@
       "persistent": true
     },
     "test:cov": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "jest.config.*", "tsconfig*.json"],
-      "outputs": ["coverage/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "jest.config.*",
+        "tsconfig*.json"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
       "cache": true
     },
     "test:e2e": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "jest.config.*", "tsconfig*.json"],
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "jest.config.*",
+        "tsconfig*.json"
+      ],
       "outputs": [],
       "cache": true
     },
@@ -69,36 +128,62 @@
       "persistent": true
     },
     "format": {
-      "inputs": ["src/**", "test/**", ".prettierrc*", "prettier.config.*"],
-      "outputs": ["src/**", "test/**"],
+      "inputs": [
+        "src/**",
+        "test/**",
+        ".prettierrc*",
+        "prettier.config.*"
+      ],
+      "outputs": [
+        "src/**",
+        "test/**"
+      ],
       "cache": false
     },
     "clean": {
       "cache": false
     },
     "db:generate": {
-      "inputs": ["prisma/schema.prisma"],
-      "outputs": ["node_modules/@prisma/client/**"],
+      "inputs": [
+        "prisma/schema.prisma"
+      ],
+      "outputs": [
+        "node_modules/@prisma/client/**"
+      ],
       "cache": true
     },
     "db:migrate": {
-      "dependsOn": ["db:generate"],
-      "inputs": ["prisma/schema.prisma", "prisma/migrations/**"],
-      "outputs": ["prisma/migrations/**"],
-      "cache": false
+      "dependsOn": [
+        "db:generate"
+      ],
+      "inputs": [
+        "prisma/schema.prisma",
+        "prisma/migrations/**"
+      ],
+      "outputs": [
+        "prisma/migrations/**"
+      ],
+      "cache": false,
+      "interactive": true
     },
     "db:push": {
-      "dependsOn": ["db:generate"],
-      "inputs": ["prisma/schema.prisma"],
+      "dependsOn": [
+        "db:generate"
+      ],
+      "inputs": [
+        "prisma/schema.prisma"
+      ],
       "outputs": [],
-      "cache": false
+      "cache": false,
+      "interactive": true
     },
     "db:studio": {
       "cache": false,
       "persistent": true
     },
     "db:reset": {
-      "cache": false
+      "cache": false,
+      "interactive": true
     }
   },
   "globalEnv": [
@@ -120,4 +205,3 @@
     ".env*"
   ]
 }
-
