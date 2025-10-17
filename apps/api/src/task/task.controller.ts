@@ -67,6 +67,20 @@ export class TaskController {
     });
   }
 
+  @Patch('/archive/:id')
+  async archiveTask(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<TaskResponseDto>> {
+    this.loggerClient.log(`Archiving task with id: ${id}`, 'info');
+    const result = await this.taskService.archive(id);
+    this.loggerClient.log(`Successfully archived task with id: ${id}`, 'info');
+    const data = responseInstance(TaskResponseDto, result) as TaskResponseDto;
+    return response<TaskResponseDto>({
+      status: true,
+      statusCode: 200,
+      message: 'Task archived successfully',
+      data: data,
+    });
+  }
+
   @Patch(':id')
   async deleteTask(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<TaskResponseDto>> {
     this.loggerClient.log(`Deleting task with id: ${id}`, 'info');

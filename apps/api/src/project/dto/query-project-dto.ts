@@ -13,6 +13,15 @@ export class QueryProjectDto {
     active?: boolean;
 
     @ApiPropertyOptional({
+        description: 'Filter by archive status',
+        example: true,
+    })
+    @IsOptional()
+    @Transform(({ value }) => value === 'true' || value === true)
+    @IsBoolean()
+    archive?: boolean;
+
+    @ApiPropertyOptional({
         description: 'Search by project name',
         example: 'ecommerce',
     })

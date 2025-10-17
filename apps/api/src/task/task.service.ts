@@ -14,7 +14,8 @@ export class TaskService {
         return await this.prisma.task.update({
             where: {
                 id: id,
-                isActive: true
+                isActive: true,
+                isArchived: false
             },
             data: {
                 ...data,
@@ -24,25 +25,47 @@ export class TaskService {
         })
     }
 
-    async getAll(query?: { active?: boolean, search?: string, sort?: string }) {
+    async archive(id: number) {
+        return await this.prisma.task.update({
+            where: {
+                id: id,
+                isActive: true,
+                isArchived: false
+            },
+            data: {
+                isArchived: true
+            }
+        })
+    }
+
+    async getAll(query?: { archive?: boolean, active?: boolean, search?: string, sort?: string }) {
         const where: any = {
-            isActive: true
+            isActive: true,
+            isArchived: false
         }
+
         const orderBy: any = {
             createdAt: "desc"
         }
+
         if (typeof query?.active === 'boolean') {
             where.isActive = query.active
         }
+
+        if (typeof query?.archive === 'boolean') {
+            where.isArchived = query.archive;
+        }
+
         if (query?.search) {
             where.name = {
                 contains: query.search
             }
         }
+
         if (query?.sort) {
             orderBy.createdAt = query.sort
         }
-        
+
         return this.prisma.task.findMany({
             where: where,
             orderBy: orderBy
@@ -53,7 +76,8 @@ export class TaskService {
         return this.prisma.task.findFirst({
             where: {
                 id: id,
-                isActive: true
+                isActive: true,
+                isArchived: false
             }
         })
     }
@@ -62,6 +86,7 @@ export class TaskService {
         return this.prisma.task.update({
             where: {
                 id: id,
+                isArchived: false
             },
             data: {
                 isActive: false,

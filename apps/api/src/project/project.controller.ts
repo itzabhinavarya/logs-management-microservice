@@ -69,6 +69,20 @@ export class ProjectController {
         });
     }
 
+    @Patch('/archive/:id')
+    async archiveProject(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
+        this.loggerClient.log(`Archiving project with id: ${id}`, 'info');
+        const res = await this.projectService.archive(id);
+        this.loggerClient.log(`Successfully archived project with id: ${id}`, 'info');
+        const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;
+        return response<ProjectResponseDto>({
+            status: true,
+            statusCode: 200,
+            data: result,
+            message: 'Project archived successfully',
+        });
+    }
+
     @Patch(':id')
     async deleteProject(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
         this.loggerClient.log(`Deleting project with id: ${id}`, 'info');

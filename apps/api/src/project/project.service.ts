@@ -5,16 +5,24 @@ import { PrismaService } from 'prisma/prisma.service';
 export class ProjectService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async getAll(query?: { active?: boolean, search?: string, sort?: string }) {
+    async getAll(query?: { archive?: boolean, active?: boolean, search?: string, sort?: string }) {
         var where: any = {
-            isActive: true
+            isActive: true,
+            isArchived: false
         }
+
         const orderBy: any = {
             createdAt: "desc"
         }
+
         if (typeof query?.active === 'boolean') {
             where.isActive = query.active;
         }
+
+        if (typeof query?.archive === 'boolean') {
+            where.isArchived = query.archive;
+        }
+
         if (query?.search) {
             where.name = {
                 contains: query.search,
@@ -35,6 +43,7 @@ export class ProjectService {
             where: {
                 id: id,
                 isActive: true,
+                isArchived: false
             }
         })
     }
@@ -49,11 +58,25 @@ export class ProjectService {
         return await this.prisma.project.update({
             where: {
                 id: id,
-                isActive: true
+                isActive: true,
+                isArchived: false
             },
             data: {
                 ...data,
                 updatedAt: new Date()
+            }
+        })
+    }
+
+    async archive(id: number) {
+        return await this.prisma.project.update({
+            where: {
+                id: id,
+                isActive: true,
+                isArchived: false
+            },
+            data: {
+                isArchived: true
             }
         })
     }
@@ -77,6 +100,7 @@ export class ProjectService {
             where: {
                 id: id,
                 isActive: true,
+                isArchived: false
             },
             data: {
                 isActive: false,
