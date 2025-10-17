@@ -10,7 +10,7 @@ export class QueryTaskDto {
     @IsOptional()
     @Transform(({ value }) => value === 'true' || value === true)
     @IsBoolean()
-    isActive?: boolean;
+    active?: boolean;
 
     @ApiPropertyOptional({
         description: 'Search by task name',

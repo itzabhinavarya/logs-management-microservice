@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
+import { CreateTaskDTO, UpdateTaskDTO } from 'src/task/dto';
 
 @Injectable()
 export class TaskService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async create(data: any) {
+    async create(data: CreateTaskDTO) {
         return await this.prisma.task.create({ data: data })
     }
 
-    async update(id, data) {
+    async update(id: number, data: UpdateTaskDTO) {
         return await this.prisma.task.update({
             where: {
                 id: id,
@@ -23,15 +24,27 @@ export class TaskService {
         })
     }
 
-    async getAll() {
+    async getAll(query?: { active?: boolean, search?: string }) {
+        const where: any = {
+            isActive: true
+        }
+        if (typeof query?.active === 'boolean') {
+            where.isActive = query.active
+        }
+        if (query?.search) {
+            where.name = {
+                contains: query.search
+            }
+        }
         return this.prisma.task.findMany({
-            where: {
-                isActive: true
+            where: where,
+            orderBy: {
+                createdAt: "desc"
             }
         })
     }
 
-    async get(id) {
+    async get(id: number) {
         return this.prisma.task.findFirst({
             where: {
                 id: id,
@@ -40,11 +53,14 @@ export class TaskService {
         })
     }
 
-    async delete(id) {
-        return this.prisma.task.delete({
+    async delete(id: number) {
+        return this.prisma.task.update({
             where: {
                 id: id,
-                isActive: true
+            },
+            data: {
+                isActive: false,
+                isDeleted: true
             }
         })
     }

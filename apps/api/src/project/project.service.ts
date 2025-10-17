@@ -5,10 +5,22 @@ import { PrismaService } from 'prisma/prisma.service';
 export class ProjectService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async getAll() {
+    async getAll(query?: { active?: boolean, search?: string }) {
+        var where: any = {
+            isActive: true
+        }
+        if (typeof query?.active === 'boolean') {
+            where.isActive = query.active;
+        }
+        if (query?.search) {
+            where.name = {
+                contains: query.search,
+            }
+        }
         return await this.prisma.project.findMany({
-            where: {
-                isActive: true
+            where: where,
+            orderBy: {
+                createdAt: "desc"
             }
         })
     }
