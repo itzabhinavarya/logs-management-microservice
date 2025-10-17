@@ -19,16 +19,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest();
-
         let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
         let message: string | string[] = 'Internal server error';
         let error = 'Internal Server Error';
 
         // Handle Prisma errors
         if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+            var cause = exception.meta?.cause
             const prismaError = this.handlePrismaError(exception);
             statusCode = prismaError.statusCode;
-            message = prismaError.message;
+            message = prismaError.message + cause;
             error = prismaError.error;
         }
         // Handle Prisma validation errors
@@ -79,62 +79,64 @@ export class AllExceptionsFilter implements ExceptionFilter {
         error: string;
     } {
         const modelName = (exception.meta?.modelName as string) || 'Record';
-
+        const cause = (exception.meta?.cause as string) || 'Internal Server Error';
+        console.log("cause", cause)
         switch (exception.code) {
             case 'P2000':
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'The provided value is too long for the field',
+                    message: 'The provided value is too long for the field' + cause,
                     error: 'Bad Request',
                 };
             case 'P2001':
                 return {
                     statusCode: HttpStatus.NOT_FOUND,
-                    message: `${modelName} does not exist`,
+                    message: `${modelName} does not exist, ${cause}`,
                     error: 'Not Found',
                 };
             case 'P2002':
                 const target = (exception.meta?.target as string[]) || [];
                 return {
                     statusCode: HttpStatus.CONFLICT,
-                    message: `${modelName} with this ${target.join(', ')} already exists`,
+                    message: `${modelName} with this ${target.join(', ')} already exists, ${cause}`,
                     error: 'Conflict',
                 };
             case 'P2003':
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'Foreign key constraint failed',
+                    message: 'Foreign key constraint failed' + cause,
                     error: 'Bad Request',
                 };
             case 'P2025':
                 return {
                     statusCode: HttpStatus.NOT_FOUND,
-                    message: `${modelName} not found`,
+                    // message: `${modelName} not found`,
+                    message: `${cause}`,
                     error: 'Not Found',
                 };
             case 'P2016':
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'Query interpretation error',
+                    message: 'Query interpretation error' + cause,
                     error: 'Bad Request',
                 };
             case 'P2021':
                 return {
                     statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                    message: 'The table does not exist in the database',
+                    message: 'The table does not exist in the database' + cause,
                     error: 'Internal Server Error',
                 };
             case 'P2022':
                 return {
                     statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                    message: 'The column does not exist in the database',
+                    message: 'The column does not exist in the database' + cause,
                     error: 'Internal Server Error',
                 };
             default:
                 this.logger.error(`Unhandled Prisma error code: ${exception.code}`, exception.message);
                 return {
                     statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                    message: 'Database operation failed',
+                    message: 'Database operation failed' + cause,
                     error: 'Internal Server Error',
                 };
         }
