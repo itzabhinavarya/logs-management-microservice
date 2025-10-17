@@ -31,7 +31,8 @@ export class ProjectService {
     async update(id: number, data: any) {
         return await this.prisma.project.update({
             where: {
-                id: id
+                id: id,
+                isActive: true
             },
             data: {
                 ...data,
