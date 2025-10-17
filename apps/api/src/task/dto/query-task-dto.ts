@@ -19,4 +19,12 @@ export class QueryTaskDto {
     @IsOptional()
     @IsString()
     search?: string;
+
+    @ApiPropertyOptional({
+        description: 'Sort by task name',
+        example: 'ecommerce',
+    })
+    @IsOptional()
+    @IsString()
+    sort?: string;
 }

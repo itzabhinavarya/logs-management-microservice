@@ -28,6 +28,7 @@ model Project {
   name            String      @unique
   description     String
   isActive        Boolean     @default(true)
+  isArchived      Boolean     @default(false)
   isModified      Boolean     @default(false)
   isDeleted       Boolean     @default(false)
   createdAt       DateTime    @default(now())
@@ -43,6 +44,7 @@ model Task {
   name            String      @unique
   description      String
   isActive        Boolean     @default(true)
+  isArchived      Boolean     @default(false)
   isModified      Boolean     @default(false)
   isDeleted       Boolean     @default(false)
   createdAt       DateTime    @default(now())

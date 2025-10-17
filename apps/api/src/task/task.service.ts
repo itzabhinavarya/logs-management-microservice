@@ -24,9 +24,12 @@ export class TaskService {
         })
     }
 
-    async getAll(query?: { active?: boolean, search?: string }) {
+    async getAll(query?: { active?: boolean, search?: string, sort?: string }) {
         const where: any = {
             isActive: true
+        }
+        const orderBy: any = {
+            createdAt: "desc"
         }
         if (typeof query?.active === 'boolean') {
             where.isActive = query.active
@@ -36,11 +39,13 @@ export class TaskService {
                 contains: query.search
             }
         }
+        if (query?.sort) {
+            orderBy.createdAt = query.sort
+        }
+        
         return this.prisma.task.findMany({
             where: where,
-            orderBy: {
-                createdAt: "desc"
-            }
+            orderBy: orderBy
         })
     }
 

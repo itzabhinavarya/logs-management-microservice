@@ -19,4 +19,12 @@ export class QueryProjectDto {
     @IsOptional()
     @IsString()
     search?: string;
+
+    @ApiPropertyOptional({
+        description: 'Sort by project name',
+        example: 'ecommerce',
+    })
+    @IsOptional()
+    @IsString()
+    sort?: string;
 }

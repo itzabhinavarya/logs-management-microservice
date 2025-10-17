@@ -5,9 +5,12 @@ import { PrismaService } from 'prisma/prisma.service';
 export class ProjectService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async getAll(query?: { active?: boolean, search?: string }) {
+    async getAll(query?: { active?: boolean, search?: string, sort?: string }) {
         var where: any = {
             isActive: true
+        }
+        const orderBy: any = {
+            createdAt: "desc"
         }
         if (typeof query?.active === 'boolean') {
             where.isActive = query.active;
@@ -17,11 +20,13 @@ export class ProjectService {
                 contains: query.search,
             }
         }
+        if (query?.sort) {
+            orderBy.createdAt = query.sort
+        }
+
         return await this.prisma.project.findMany({
             where: where,
-            orderBy: {
-                createdAt: "desc"
-            }
+            orderBy: orderBy
         })
     }
 
@@ -54,6 +59,20 @@ export class ProjectService {
     }
 
     async delete(id: number) {
+        const project = await this.prisma.project.findUnique({
+            where: { id },
+            include: { tasks: true },
+        });
+
+        if (!project || !project.isActive) {
+            throw new Error('Project not found or already inactive');
+        }
+
+        // 2️⃣ Prevent deletion if it has tasks
+        if (project.tasks && project.tasks.length > 0) {
+            throw new Error('Cannot delete project because it has associated tasks');
+        }
+
         return await this.prisma.project.update({
             where: {
                 id: id,
