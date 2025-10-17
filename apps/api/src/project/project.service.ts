@@ -43,7 +43,8 @@ export class ProjectService {
     async delete(id: number) {
         return await this.prisma.project.update({
             where: {
-                id: id
+                id: id,
+                isActive: true,
             },
             data: {
                 isActive: false,
