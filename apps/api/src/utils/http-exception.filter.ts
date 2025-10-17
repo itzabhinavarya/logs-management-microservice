@@ -10,10 +10,13 @@ import {
 import { Response } from 'express';
 import { errorResponse } from 'src/utils/response';
 import { Prisma } from '@prisma/client';
+import { LoggerClient } from 'src/infrastructure/logger.client';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
     private readonly logger = new Logger(AllExceptionsFilter.name);
+
+    private readonly loggerClient = new LoggerClient(); // manually create
 
     catch(exception: unknown, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
@@ -29,6 +32,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
             statusCode = prismaError.statusCode;
             message = prismaError.message;
             error = prismaError.error;
+
+            // Log error
+            this.logger.error(`Prisma known request error: ${exception.code} - ${prismaError.message}`);
+            this.loggerClient.log(`Prisma error: ${exception.code} - ${prismaError.message}`, 'error');
         }
         // Handle Prisma validation errors
         else if (exception instanceof Prisma.PrismaClientValidationError) {
@@ -36,31 +43,34 @@ export class AllExceptionsFilter implements ExceptionFilter {
             message = 'Validation error in request data';
             error = 'Bad Request';
             this.logger.error('Prisma validation error', exception.message);
+            this.loggerClient.log(`Prisma validation error: ${exception.message}`, 'error');
         }
         // Handle HTTP exceptions
         else if (exception instanceof HttpException) {
             statusCode = exception.getStatus();
-            const errorResponse = exception.getResponse();
+            const errorResponseData = exception.getResponse();
 
-            if (typeof errorResponse === 'object') {
-                message = (errorResponse as any).message || message;
-                error = (errorResponse as any).error || error;
+            if (typeof errorResponseData === 'object') {
+                message = (errorResponseData as any).message || message;
+                error = (errorResponseData as any).error || error;
             } else {
-                message = errorResponse;
+                message = errorResponseData;
             }
+
+            this.logger.error(`HTTP exception: ${statusCode} - ${message}`);
+            this.loggerClient.log(`HTTP exception: ${statusCode} - ${message}`, 'error');
         }
         // Handle regular JavaScript errors
         else if (exception instanceof Error) {
             message = exception.message;
             error = 'Error';
-            this.logger.error(
-                `Unhandled exception: ${exception.message}`,
-                exception.stack,
-            );
+            this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack);
+            this.loggerClient.log(`Unhandled exception: ${exception.message}`, 'error');
         }
         // Handle unknown exceptions
         else {
             this.logger.error('Unknown exception occurred', exception);
+            this.loggerClient.log(`Unknown exception: ${JSON.stringify(exception)}`, 'error');
         }
 
         const result = errorResponse(
@@ -79,12 +89,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     } {
         const modelName = (exception.meta?.modelName as string) || 'Record';
         const cause = (exception.meta?.cause as string) || 'Internal Server Error';
-        console.log("cause", cause)
+
         switch (exception.code) {
             case 'P2000':
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'The provided value is too long for the field' + cause,
+                    message: 'The provided value is too long for the field ' + cause,
                     error: 'Bad Request',
                 };
             case 'P2001':
@@ -103,39 +113,39 @@ export class AllExceptionsFilter implements ExceptionFilter {
             case 'P2003':
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'Foreign key constraint failed' + cause,
+                    message: 'Foreign key constraint failed ' + cause,
                     error: 'Bad Request',
                 };
             case 'P2025':
                 return {
                     statusCode: HttpStatus.NOT_FOUND,
-                    // message: `${modelName} not found`,
                     message: `${cause}`,
                     error: 'Not Found',
                 };
             case 'P2016':
                 return {
                     statusCode: HttpStatus.BAD_REQUEST,
-                    message: 'Query interpretation error' + cause,
+                    message: 'Query interpretation error ' + cause,
                     error: 'Bad Request',
                 };
             case 'P2021':
                 return {
                     statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                    message: 'The table does not exist in the database' + cause,
+                    message: 'The table does not exist in the database ' + cause,
                     error: 'Internal Server Error',
                 };
             case 'P2022':
                 return {
                     statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                    message: 'The column does not exist in the database' + cause,
+                    message: 'The column does not exist in the database ' + cause,
                     error: 'Internal Server Error',
                 };
             default:
                 this.logger.error(`Unhandled Prisma error code: ${exception.code}`, exception.message);
+                this.loggerClient.log(`Unhandled Prisma error code: ${exception.code} - ${exception.message}`, 'error');
                 return {
                     statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                    message: 'Database operation failed' + cause,
+                    message: 'Database operation failed ' + cause,
                     error: 'Internal Server Error',
                 };
         }
