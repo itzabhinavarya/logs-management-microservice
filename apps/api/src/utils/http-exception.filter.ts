@@ -25,10 +25,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
         // Handle Prisma errors
         if (exception instanceof Prisma.PrismaClientKnownRequestError) {
-            var cause = exception.meta?.cause
             const prismaError = this.handlePrismaError(exception);
             statusCode = prismaError.statusCode;
-            message = prismaError.message + cause;
+            message = prismaError.message;
             error = prismaError.error;
         }
         // Handle Prisma validation errors
