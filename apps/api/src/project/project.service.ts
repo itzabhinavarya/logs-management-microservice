@@ -5,7 +5,14 @@ import { PrismaService } from 'prisma/prisma.service';
 export class ProjectService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async getAll(query?: { archive?: boolean, active?: boolean, search?: string, sort?: string }) {
+    async getAll(query?: {
+        archive?: boolean,
+        active?: boolean,
+        search?: string,
+        sort?: string,
+        page?: number;
+        limit?: number;
+    }) {
         var where: any = {
             isActive: true,
             isArchived: false
@@ -32,10 +39,31 @@ export class ProjectService {
             orderBy.createdAt = query.sort
         }
 
-        return await this.prisma.project.findMany({
-            where: where,
-            orderBy: orderBy
-        })
+        const page = query?.page ?? 1;
+        const limit = query?.limit ?? 10;
+        const skip = (page - 1) * limit;
+
+        const [data, total] = await Promise.all([
+            this.prisma.project.findMany({
+                where,
+                orderBy,
+                skip,
+                take: limit,
+            }),
+            this.prisma.project.count({ where }),
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages,
+            },
+        };
     }
 
     async get(id: number) {

@@ -14,14 +14,15 @@ export class TaskController {
   @Get('')
   async allTasks(@Query() query?: QueryTaskDto): Promise<ApiResponse<TaskResponseDto[]>> {
     this.loggerClient.log('Fetching all tasks', 'info');
-    const result = await this.taskService.getAll(query);
-    this.loggerClient.log(`Successfully fetched ${result.length} tasks`, 'info');
-    const data = responseInstance(TaskResponseDto, result) as TaskResponseDto[];
+    const { data, meta } = await this.taskService.getAll(query);
+    this.loggerClient.log(`Successfully fetched ${data.length} tasks`, 'info');
+    const result = responseInstance(TaskResponseDto, data) as TaskResponseDto[];
     return response<TaskResponseDto[]>({
       status: true,
       statusCode: 200,
       message: 'All Task fetched successfully',
-      data: data,
+      data: result,
+      meta
     });
   }
 

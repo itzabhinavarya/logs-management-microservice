@@ -14,9 +14,8 @@ export class ProjectController {
 
     @Get('')
     async allProject(@Query() query?: QueryProjectDto): Promise<ApiResponse<ProjectResponseDto[]>> {
-        console.log("query", query)
         this.loggerClient.log('Fetching all projects', 'info');
-        const data = await this.projectService.getAll(query);
+        const { data, meta } = await this.projectService.getAll(query);
         this.loggerClient.log(`Successfully fetched ${data.length} projects`, 'info');
         const result = responseInstance(ProjectResponseDto, data) as ProjectResponseDto[];
         return response<ProjectResponseDto[]>({
@@ -24,6 +23,7 @@ export class ProjectController {
             statusCode: 200,
             message: 'All projects fetched successfully',
             data: result,
+            meta: meta
         });
     }
 

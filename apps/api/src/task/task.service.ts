@@ -38,7 +38,14 @@ export class TaskService {
         })
     }
 
-    async getAll(query?: { archive?: boolean, active?: boolean, search?: string, sort?: string }) {
+    async getAll(query?: {
+        archive?: boolean,
+        active?: boolean,
+        search?: string,
+        sort?: string,
+        page?: number;
+        limit?: number;
+    }) {
         const where: any = {
             isActive: true,
             isArchived: false
@@ -66,10 +73,31 @@ export class TaskService {
             orderBy.createdAt = query.sort
         }
 
-        return this.prisma.task.findMany({
-            where: where,
-            orderBy: orderBy
-        })
+        const page = query?.page ?? 1;
+        const limit = query?.limit ?? 10;
+        const skip = (page - 1) * limit;
+
+        const [data, total] = await Promise.all([
+            this.prisma.task.findMany({
+                where,
+                orderBy,
+                skip,
+                take: limit,
+            }),
+            this.prisma.task.count({ where }),
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages,
+            },
+        };
     }
 
     async get(id: number) {
