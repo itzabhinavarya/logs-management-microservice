@@ -46,7 +46,7 @@ model Task {
   isModified      Boolean     @default(false)
   isDeleted       Boolean     @default(false)
   createdAt       DateTime    @default(now())
-  updatedAt       DateTime   
+  updatedAt       DateTime?   
 
   project         Project     @relation(fields: [projectId], references:[id])
 }
