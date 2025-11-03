@@ -6,7 +6,7 @@ import { CreateTaskDTO, UpdateTaskDTO } from 'src/task/dto';
 export class TaskService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async create(data: CreateTaskDTO) {
+    async create(data: CreateTaskDTO & { userId: number }) {
         return await this.prisma.task.create({ data: data })
     }
 

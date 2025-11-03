@@ -1,19 +1,23 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDTO, UpdateTaskDTO, QueryTaskDto, TaskResponseDto } from './dto/index'
 import { ApiResponse, response, responseInstance } from 'src/utils/response';
 import { LoggerClient } from 'src/infrastructure/logger.client';
+import { AuthGuard } from 'src/infrastructure/auth.guard';
+import { GetUser } from 'src/infrastructure/get-user.decorator';
+import type { JwtPayload } from 'src/infrastructure/jwt.service';
 
 @Controller('tasks')
 export class TaskController {
   constructor(
     private readonly taskService: TaskService,
-    private readonly loggerClient: LoggerClient // Inject LoggerClient
+    private readonly loggerClient: LoggerClient
   ) { }
 
+  @UseGuards(AuthGuard)
   @Get('')
-  async allTasks(@Query() query?: QueryTaskDto): Promise<ApiResponse<TaskResponseDto[]>> {
-    this.loggerClient.log('Fetching all tasks', 'info');
+  async allTasks(@GetUser() user: JwtPayload, @Query() query?: QueryTaskDto): Promise<ApiResponse<TaskResponseDto[]>> {
+    this.loggerClient.log('Fetching all tasks', 'info', { userId: user.userId });
     const { data, meta } = await this.taskService.getAll(query);
     this.loggerClient.log(`Successfully fetched ${data.length} tasks`, 'info');
     const result = responseInstance(TaskResponseDto, data) as TaskResponseDto[];
@@ -26,9 +30,10 @@ export class TaskController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
-  async singleTask(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<TaskResponseDto>> {
-    this.loggerClient.log(`Fetching task with id: ${id}`, 'info');
+  async singleTask(@GetUser() user: JwtPayload, @Param('id', ParseIntPipe) id: number): Promise<ApiResponse<TaskResponseDto>> {
+    this.loggerClient.log(`Fetching task with id: ${id}`, 'info', { userId: user.userId });
     const result = await this.taskService.get(id);
     this.loggerClient.log(`Successfully fetched task with id: ${id}`, 'info');
     const data = responseInstance(TaskResponseDto, result) as TaskResponseDto;
@@ -40,10 +45,12 @@ export class TaskController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Post()
-  async createTask(@Body() data: CreateTaskDTO): Promise<ApiResponse<TaskResponseDto>> {
-    this.loggerClient.log('Creating a new task', 'info');
-    const result = await this.taskService.create(data);
+  async createTask(@GetUser() user: JwtPayload, @Body() data: CreateTaskDTO): Promise<ApiResponse<TaskResponseDto>> {
+    this.loggerClient.log('Creating a new task', 'info', { userId: user.userId });
+    const taskData = { ...data, userId: user.userId };
+    const result = await this.taskService.create(taskData);
     this.loggerClient.log(`Task created with id: ${result.id}`, 'info');
     const res = responseInstance(TaskResponseDto, result) as TaskResponseDto;
     return response<TaskResponseDto>({
@@ -54,9 +61,10 @@ export class TaskController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Put(':id')
-  async updateTask(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateTaskDTO): Promise<ApiResponse<TaskResponseDto>> {
-    this.loggerClient.log(`Updating task with id: ${id}`, 'info');
+  async updateTask(@GetUser() user: JwtPayload, @Param('id', ParseIntPipe) id: number, @Body() data: UpdateTaskDTO): Promise<ApiResponse<TaskResponseDto>> {
+    this.loggerClient.log(`Updating task with id: ${id}`, 'info', { userId: user.userId });
     const result = await this.taskService.update(id, data);
     this.loggerClient.log(`Successfully updated task with id: ${id}`, 'info');
     const res = responseInstance(TaskResponseDto, result) as TaskResponseDto;
@@ -68,9 +76,10 @@ export class TaskController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Patch('/archive/:id')
-  async archiveTask(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<TaskResponseDto>> {
-    this.loggerClient.log(`Archiving task with id: ${id}`, 'info');
+  async archiveTask(@GetUser() user: JwtPayload, @Param('id', ParseIntPipe) id: number): Promise<ApiResponse<TaskResponseDto>> {
+    this.loggerClient.log(`Archiving task with id: ${id}`, 'info', { userId: user.userId });
     const result = await this.taskService.archive(id);
     this.loggerClient.log(`Successfully archived task with id: ${id}`, 'info');
     const data = responseInstance(TaskResponseDto, result) as TaskResponseDto;
@@ -82,9 +91,10 @@ export class TaskController {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
-  async deleteTask(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<TaskResponseDto>> {
-    this.loggerClient.log(`Deleting task with id: ${id}`, 'info');
+  async deleteTask(@GetUser() user: JwtPayload, @Param('id', ParseIntPipe) id: number): Promise<ApiResponse<TaskResponseDto>> {
+    this.loggerClient.log(`Deleting task with id: ${id}`, 'info', { userId: user.userId });
     const result = await this.taskService.delete(id);
     this.loggerClient.log(`Successfully deleted task with id: ${id}`, 'info');
     const data = responseInstance(TaskResponseDto, result) as TaskResponseDto;

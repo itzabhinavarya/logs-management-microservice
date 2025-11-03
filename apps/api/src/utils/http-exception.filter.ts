@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { errorResponse } from 'src/utils/response';
-import { Prisma } from '@prisma/client';
 import { LoggerClient } from 'src/infrastructure/logger.client';
 
 @Catch()
@@ -26,24 +25,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
         let message: string | string[] = 'Internal server error';
         let error = 'Internal Server Error';
 
-        // Handle Prisma errors
-        if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+        // Handle Prisma errors by checking error name
+        if (this.isPrismaError(exception)) {
             const prismaError = this.handlePrismaError(exception);
             statusCode = prismaError.statusCode;
             message = prismaError.message;
             error = prismaError.error;
 
             // Log error
-            this.logger.error(`Prisma known request error: ${exception.code} - ${prismaError.message}`);
-            this.loggerClient.log(`Prisma error: ${exception.code} - ${prismaError.message}`, 'error');
+            this.logger.error(`Prisma known request error: ${(exception as any).code} - ${prismaError.message}`);
+            this.loggerClient.log(`Prisma error: ${(exception as any).code} - ${prismaError.message}`, 'error');
         }
         // Handle Prisma validation errors
-        else if (exception instanceof Prisma.PrismaClientValidationError) {
+        else if (this.isPrismaValidationError(exception)) {
             statusCode = HttpStatus.BAD_REQUEST;
             message = 'Validation error in request data';
             error = 'Bad Request';
-            this.logger.error('Prisma validation error', exception.message);
-            this.loggerClient.log(`Prisma validation error: ${exception.message}`, 'error');
+            this.logger.error('Prisma validation error', (exception as any).message);
+            this.loggerClient.log(`Prisma validation error: ${(exception as any).message}`, 'error');
         }
         // Handle HTTP exceptions
         else if (exception instanceof HttpException) {
@@ -82,7 +81,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
         response.status(statusCode).json(result);
     }
 
-    private handlePrismaError(exception: Prisma.PrismaClientKnownRequestError): {
+    private isPrismaError(exception: unknown): boolean {
+        return (
+            typeof exception === 'object' &&
+            exception !== null &&
+            'code' in exception &&
+            'meta' in exception &&
+            (exception as any).constructor.name === 'PrismaClientKnownRequestError'
+        );
+    }
+
+    private isPrismaValidationError(exception: unknown): boolean {
+        return (
+            typeof exception === 'object' &&
+            exception !== null &&
+            (exception as any).constructor.name === 'PrismaClientValidationError'
+        );
+    }
+
+    private handlePrismaError(exception: any): {
         statusCode: number;
         message: string;
         error: string;

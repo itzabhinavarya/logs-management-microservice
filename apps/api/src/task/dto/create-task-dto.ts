@@ -1,15 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength, IsInt } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateTaskDTO {
-    @ApiProperty({
-        description: "User ID",
-        example: 1,
-    })
-    @IsInt()
-    @IsNotEmpty({ message: "User ID is required" })
-    userId: number;
-
     @ApiProperty({
         description: "Project Id",
         example: 1,

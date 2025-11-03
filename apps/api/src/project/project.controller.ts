@@ -1,20 +1,24 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ProjectService } from 'src/project/project.service';
 import { CreateProjectDto, ProjectResponseDto, QueryProjectDto, UpdateProjectDto } from './dto'
 import { ApiResponse, response, responseInstance } from 'src/utils/response';
 import { LoggerClient } from 'src/infrastructure/logger.client';
+import { AuthGuard } from 'src/infrastructure/auth.guard';
+import { GetUser } from 'src/infrastructure/get-user.decorator';
+import type { JwtPayload } from 'src/infrastructure/jwt.service';
 
 @Controller('project')
 export class ProjectController {
 
     constructor(
         private readonly projectService: ProjectService,
-        private readonly loggerClient: LoggerClient // Inject LoggerClient
+        private readonly loggerClient: LoggerClient
     ) { }
 
+    @UseGuards(AuthGuard)
     @Get('')
-    async allProject(@Query() query?: QueryProjectDto): Promise<ApiResponse<ProjectResponseDto[]>> {
-        this.loggerClient.log('Fetching all projects', 'info');
+    async allProject(@GetUser() user: JwtPayload, @Query() query?: QueryProjectDto): Promise<ApiResponse<ProjectResponseDto[]>> {
+        this.loggerClient.log('Fetching all projects', 'info', { userId: user.userId });
         const { data, meta } = await this.projectService.getAll(query);
         this.loggerClient.log(`Successfully fetched ${data.length} projects`, 'info');
         const result = responseInstance(ProjectResponseDto, data) as ProjectResponseDto[];
@@ -27,9 +31,10 @@ export class ProjectController {
         });
     }
 
+    @UseGuards(AuthGuard)
     @Get(':id')
-    async getProject(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
-        this.loggerClient.log(`Fetching project with id: ${id}`, 'info');
+    async getProject(@GetUser() user: JwtPayload, @Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
+        this.loggerClient.log(`Fetching project with id: ${id}`, 'info', { userId: user.userId });
         const data = await this.projectService.get(id);
         this.loggerClient.log(`Successfully fetched project with id: ${id}`, 'info');
         const result = responseInstance(ProjectResponseDto, data) as ProjectResponseDto;
@@ -41,10 +46,12 @@ export class ProjectController {
         });
     }
 
+    @UseGuards(AuthGuard)
     @Post('')
-    async createProject(@Body() data: CreateProjectDto): Promise<ApiResponse<ProjectResponseDto>> {
-        this.loggerClient.log('Creating a new project', 'info');
-        const res = await this.projectService.create(data);
+    async createProject(@GetUser() user: JwtPayload, @Body() data: CreateProjectDto): Promise<ApiResponse<ProjectResponseDto>> {
+        this.loggerClient.log('Creating a new project', 'info', { userId: user.userId });
+        const projectData = { ...data, userId: user.userId };
+        const res = await this.projectService.create(projectData);
         this.loggerClient.log(`Project created with id: ${res.id}`, 'info');
         const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;
         return response<ProjectResponseDto>({
@@ -55,9 +62,10 @@ export class ProjectController {
         });
     }
 
+    @UseGuards(AuthGuard)
     @Put(':id')
-    async updateProject(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateProjectDto): Promise<ApiResponse<ProjectResponseDto>> {
-        this.loggerClient.log(`Updating project with id: ${id}`, 'info');
+    async updateProject(@GetUser() user: JwtPayload, @Param('id', ParseIntPipe) id: number, @Body() data: UpdateProjectDto): Promise<ApiResponse<ProjectResponseDto>> {
+        this.loggerClient.log(`Updating project with id: ${id}`, 'info', { userId: user.userId });
         const res = await this.projectService.update(id, data);
         this.loggerClient.log(`Successfully updated project with id: ${id}`, 'info');
         const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;
@@ -69,9 +77,10 @@ export class ProjectController {
         });
     }
 
+    @UseGuards(AuthGuard)
     @Patch('/archive/:id')
-    async archiveProject(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
-        this.loggerClient.log(`Archiving project with id: ${id}`, 'info');
+    async archiveProject(@GetUser() user: JwtPayload, @Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
+        this.loggerClient.log(`Archiving project with id: ${id}`, 'info', { userId: user.userId });
         const res = await this.projectService.archive(id);
         this.loggerClient.log(`Successfully archived project with id: ${id}`, 'info');
         const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;
@@ -83,9 +92,10 @@ export class ProjectController {
         });
     }
 
+    @UseGuards(AuthGuard)
     @Patch(':id')
-    async deleteProject(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
-        this.loggerClient.log(`Deleting project with id: ${id}`, 'info');
+    async deleteProject(@GetUser() user: JwtPayload, @Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
+        this.loggerClient.log(`Deleting project with id: ${id}`, 'info', { userId: user.userId });
         const res = await this.projectService.delete(id);
         this.loggerClient.log(`Successfully deleted project with id: ${id}`, 'info');
         const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;

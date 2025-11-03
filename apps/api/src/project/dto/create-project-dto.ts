@@ -1,15 +1,7 @@
-import { IsString, IsNotEmpty, MinLength, MaxLength, IsOptional, IsInt } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, MaxLength, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProjectDto {
-    @ApiProperty({
-        description: 'User ID',
-        example: 1,
-    })
-    @IsInt()
-    @IsNotEmpty({ message: "User ID is required" })
-    userId: number;
-
     @ApiProperty({
         description: 'Project name',
         example: 'E-commerce Platform',

@@ -81,7 +81,7 @@ export class ProjectService {
         })
     }
 
-    async create(data: any) {
+    async create(data: any & { userId: number }) {
         return await this.prisma.project.create({
             data: data
         })
@@ -109,6 +109,7 @@ export class ProjectService {
                 isArchived: false
             },
             data: {
+                isActive: false,
                 isArchived: true
             }
         })
