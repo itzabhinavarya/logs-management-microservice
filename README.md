@@ -27,6 +27,17 @@ pnpm install
 pnpm run db:generate
 ```
 
+### Environment Setup
+
+Copy the example environment file and update values:
+
+```bash
+# Copy .env.example to .env
+cp .env.example .env
+```
+
+Then update the `.env` file with your database credentials and other settings.
+
 ### Development
 
 ```bash
@@ -34,9 +45,9 @@ pnpm run db:generate
 pnpm run dev:all
 
 # Run individual services
-pnpm run dev:api      # API on port 3001
+pnpm run dev:api      # API on port 4000
 pnpm run dev:gateway  # Gateway on port 3000
-pnpm run dev:logger   # Logger on port 3002
+pnpm run dev:logger   # Logger on port 4001
 ```
 
 ### Build & Production
@@ -68,6 +79,23 @@ logs-management-microservice/
 └── infra/           # Infrastructure configs
 ```
 
+## 🔐 Authentication
+
+JWT-based authentication system with the following endpoints:
+
+**Public Endpoints:**
+- `POST /api/user/signup` - Register new user
+- `POST /api/user/login` - Login (returns JWT token)
+- `POST /api/user/verify-otp` - Verify account with OTP
+- `POST /api/user/resend-otp` - Resend OTP
+- `POST /api/user/reset-password` - Reset password
+
+**Protected Endpoints** (require `Authorization: Bearer <token>` header):
+- User CRUD operations
+- Project management (create, update, archive, delete)
+- Task management (create, update, archive, delete)
+- Dashboard statistics
+
 ## 🗄️ Database Commands
 
 ```bash
@@ -90,7 +118,8 @@ pnpm run format       # Format code
 
 - **Framework:** NestJS
 - **Language:** TypeScript
-- **Database:** Prisma ORM
+- **Database:** Prisma ORM (MySQL)
+- **Authentication:** JWT (jsonwebtoken)
 - **Logging:** Winston
 - **Build Tool:** Turborepo
 - **Package Manager:** pnpm
