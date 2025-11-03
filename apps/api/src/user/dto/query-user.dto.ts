@@ -2,7 +2,7 @@ import { IsOptional, IsBoolean, IsString, IsInt, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class QueryTaskDto {
+export class QueryUserDto {
     @ApiPropertyOptional({
         description: 'Filter by active status',
         example: true,
@@ -13,35 +13,17 @@ export class QueryTaskDto {
     active?: boolean;
 
     @ApiPropertyOptional({
-        description: 'Filter by archive status',
+        description: 'Filter by verified status',
         example: true,
     })
     @IsOptional()
     @Transform(({ value }) => value === 'true' || value === true)
     @IsBoolean()
-    archive?: boolean;
+    verified?: boolean;
 
     @ApiPropertyOptional({
-        description: 'Filter by user ID',
-        example: 1,
-    })
-    @IsOptional()
-    @Transform(({ value }) => parseInt(value))
-    @IsInt()
-    userId?: number;
-
-    @ApiPropertyOptional({
-        description: 'Task associated by project',
-        example: 1,
-    })
-    @IsOptional()
-    @Transform(({ value }) => parseInt(value))
-    @IsInt()
-    projectId?: number;
-
-    @ApiPropertyOptional({
-        description: 'Search by task name',
-        example: 'authentication',
+        description: 'Search by user name or email',
+        example: 'john',
     })
     @IsOptional()
     @IsString()
@@ -69,3 +51,4 @@ export class QueryTaskDto {
     @Min(1)
     limit?: number = 10;
 }
+

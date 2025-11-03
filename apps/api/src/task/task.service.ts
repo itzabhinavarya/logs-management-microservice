@@ -42,11 +42,12 @@ export class TaskService {
     async getAll(query?: {
         archive?: boolean,
         active?: boolean,
+        userId?: number,
+        projectId?: number,
         search?: string,
         sort?: string,
         page?: number;
         limit?: number;
-        projectId?: number;
     }) {
         const where: any = {
             isActive: true,
@@ -63,6 +64,10 @@ export class TaskService {
 
         if (typeof query?.archive === 'boolean') {
             where.isArchived = query.archive;
+        }
+
+        if (query?.userId) {
+            where.userId = query.userId;
         }
 
         if(query?.projectId){

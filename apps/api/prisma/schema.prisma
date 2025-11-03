@@ -18,13 +18,24 @@ model User {
   id              Int         @id @default(autoincrement())
   name            String
   email           String      @unique
+  password        String
   city            String
   phone           String
+  isVerified      Boolean     @default(false)
+  otp             String?
+  otpExpiry       DateTime?
+  isActive        Boolean     @default(true)
+  isDeleted       Boolean     @default(false)
   createdAt       DateTime    @default(now())
+  updatedAt       DateTime?
+
+  projects        Project[]
+  tasks           Task[]
 }
 
 model Project {
   id              Int         @id @default(autoincrement())
+  userId          Int
   name            String      @unique
   description     String
   isActive        Boolean     @default(true)
@@ -34,15 +45,17 @@ model Project {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime?   
 
+  user            User        @relation(fields: [userId], references: [id])
   tasks           Task[]
 }
 
 
 model Task {
   id              Int         @id @default(autoincrement())
+  userId          Int
   projectId       Int         
   name            String      @unique
-  description      String
+  description     String
   isActive        Boolean     @default(true)
   isArchived      Boolean     @default(false)
   isModified      Boolean     @default(false)
@@ -50,5 +63,6 @@ model Task {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime?   
 
+  user            User        @relation(fields: [userId], references: [id])
   project         Project     @relation(fields: [projectId], references:[id])
 }

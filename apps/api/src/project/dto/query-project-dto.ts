@@ -22,6 +22,15 @@ export class QueryProjectDto {
     archive?: boolean;
 
     @ApiPropertyOptional({
+        description: 'Filter by user ID',
+        example: 1,
+    })
+    @IsOptional()
+    @Transform(({ value }) => parseInt(value))
+    @IsInt()
+    userId?: number;
+
+    @ApiPropertyOptional({
         description: 'Search by project name',
         example: 'ecommerce',
     })
