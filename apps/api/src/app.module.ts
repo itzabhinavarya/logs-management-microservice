@@ -7,6 +7,7 @@ import { LoggerModule } from './infrastructure/logger.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -16,7 +17,8 @@ import { TaskModule } from './task/task.module';
     UserModule,
     LoggerModule,
     ProjectModule,
-    TaskModule
+    TaskModule,
+    DashboardModule
   ], // LoggerModule available globally
   controllers: [AppController],
   providers: [AppService],

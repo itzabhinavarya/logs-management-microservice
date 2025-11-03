@@ -33,6 +33,7 @@ export class TaskService {
                 isArchived: false
             },
             data: {
+                isActive: false,
                 isArchived: true
             }
         })
@@ -45,6 +46,7 @@ export class TaskService {
         sort?: string,
         page?: number;
         limit?: number;
+        projectId?: number;
     }) {
         const where: any = {
             isActive: true,
@@ -61,6 +63,10 @@ export class TaskService {
 
         if (typeof query?.archive === 'boolean') {
             where.isArchived = query.archive;
+        }
+
+        if(query?.projectId){
+            where.projectId = query.projectId;
         }
 
         if (query?.search) {

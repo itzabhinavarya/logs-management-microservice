@@ -30,6 +30,15 @@ export class QueryTaskDto {
     search?: string;
 
     @ApiPropertyOptional({
+        description: 'Task associated by project',
+        example: 'Task: User management',
+    })
+    @IsOptional()
+    @Transform(({ value }) => parseInt(value))
+    @IsInt()
+    projectId?: number;
+
+    @ApiPropertyOptional({
         description: 'Sort by task name',
         example: 'ecommerce',
     })
