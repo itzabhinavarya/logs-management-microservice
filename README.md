@@ -2,6 +2,8 @@
 
 Enterprise-grade microservices architecture with centralized logging, built using NestJS, Prisma, and Turborepo.
 
+📋 **[View Feature Roadmap](ROADMAP.md)** - Track upcoming features and implementation progress
+
 ## 🏗️ Architecture
 
 This monorepo contains three microservices:
