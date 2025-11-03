@@ -2,71 +2,98 @@ import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, Query } f
 import { ProjectService } from 'src/project/project.service';
 import { CreateProjectDto, ProjectResponseDto, QueryProjectDto, UpdateProjectDto } from './dto'
 import { ApiResponse, response, responseInstance } from 'src/utils/response';
+import { LoggerClient } from 'src/infrastructure/logger.client';
 
 @Controller('project')
 export class ProjectController {
 
-    constructor(private readonly projectService: ProjectService) { }
+    constructor(
+        private readonly projectService: ProjectService,
+        private readonly loggerClient: LoggerClient // Inject LoggerClient
+    ) { }
 
     @Get('')
     async allProject(@Query() query?: QueryProjectDto): Promise<ApiResponse<ProjectResponseDto[]>> {
-        const data = await this.projectService.getAll();
+        this.loggerClient.log('Fetching all projects', 'info');
+        const { data, meta } = await this.projectService.getAll(query);
+        this.loggerClient.log(`Successfully fetched ${data.length} projects`, 'info');
         const result = responseInstance(ProjectResponseDto, data) as ProjectResponseDto[];
         return response<ProjectResponseDto[]>({
             status: true,
             statusCode: 200,
             message: 'All projects fetched successfully',
             data: result,
+            meta: meta
         });
     }
 
     @Get(':id')
     async getProject(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
-        const data = await this.projectService.get(id)
+        this.loggerClient.log(`Fetching project with id: ${id}`, 'info');
+        const data = await this.projectService.get(id);
+        this.loggerClient.log(`Successfully fetched project with id: ${id}`, 'info');
         const result = responseInstance(ProjectResponseDto, data) as ProjectResponseDto;
         return response<ProjectResponseDto>({
             status: true,
             statusCode: 200,
-            message: 'Projects fetched successfully',
+            message: 'Project fetched successfully',
             data: result,
         });
-
     }
 
     @Post('')
     async createProject(@Body() data: CreateProjectDto): Promise<ApiResponse<ProjectResponseDto>> {
-        const res = await this.projectService.create(data)
+        this.loggerClient.log('Creating a new project', 'info');
+        const res = await this.projectService.create(data);
+        this.loggerClient.log(`Project created with id: ${res.id}`, 'info');
         const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;
         return response<ProjectResponseDto>({
             status: true,
             statusCode: 200,
             data: result,
-            message: 'Projects created successfully',
+            message: 'Project created successfully',
         });
     }
 
     @Put(':id')
     async updateProject(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateProjectDto): Promise<ApiResponse<ProjectResponseDto>> {
-        const res = await this.projectService.update(id, data)
+        this.loggerClient.log(`Updating project with id: ${id}`, 'info');
+        const res = await this.projectService.update(id, data);
+        this.loggerClient.log(`Successfully updated project with id: ${id}`, 'info');
         const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;
         return response<ProjectResponseDto>({
             status: true,
             statusCode: 200,
             data: result,
-            message: 'Projects updated successfully',
+            message: 'Project updated successfully',
+        });
+    }
+
+    @Patch('/archive/:id')
+    async archiveProject(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
+        this.loggerClient.log(`Archiving project with id: ${id}`, 'info');
+        const res = await this.projectService.archive(id);
+        this.loggerClient.log(`Successfully archived project with id: ${id}`, 'info');
+        const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;
+        return response<ProjectResponseDto>({
+            status: true,
+            statusCode: 200,
+            data: result,
+            message: 'Project archived successfully',
         });
     }
 
     @Patch(':id')
     async deleteProject(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<ProjectResponseDto>> {
-        const res = await this.projectService.delete(id)
+        this.loggerClient.log(`Deleting project with id: ${id}`, 'info');
+        const res = await this.projectService.delete(id);
+        this.loggerClient.log(`Successfully deleted project with id: ${id}`, 'info');
         const result = responseInstance(ProjectResponseDto, res) as ProjectResponseDto;
         return response<ProjectResponseDto>({
             status: true,
             statusCode: 200,
             data: result,
-            message: 'Projects updated successfully',
+            message: 'Project deleted successfully',
         });
     }
-
 }

@@ -27,6 +27,18 @@ export class ApiResponse<T = any> {
     @ApiProperty({ example: {}, required: false })
     data?: T | T[];
 
+    @ApiProperty({
+        description: 'Pagination or metadata information',
+        example: {
+            total: 50,
+            page: 2,
+            limit: 10,
+            totalPages: 5,
+        },
+        required: false,
+    })
+    meta?: Record<string, any>;
+
     constructor(partial: Partial<ApiResponse<T>>) {
         Object.assign(this, partial);
     }
@@ -46,13 +58,15 @@ interface ResponseParams<T> {
     statusCode: number;
     message: string;
     data?: T;
+    meta?: Record<string, any>;
 }
 
 export function response<T = any>({
     status,
     statusCode,
     message,
-    data
+    data,
+    meta,
 }: ResponseParams<T>): ApiResponse<T> {
     return new ApiResponse<T>({
         status,
@@ -60,6 +74,7 @@ export function response<T = any>({
         message,
         timestamp: new Date().toISOString(),
         data,
+        meta
     });
 }
 

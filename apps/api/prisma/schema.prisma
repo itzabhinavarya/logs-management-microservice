@@ -28,6 +28,7 @@ model Project {
   name            String      @unique
   description     String
   isActive        Boolean     @default(true)
+  isArchived      Boolean     @default(false)
   isModified      Boolean     @default(false)
   isDeleted       Boolean     @default(false)
   createdAt       DateTime    @default(now())
@@ -41,12 +42,13 @@ model Task {
   id              Int         @id @default(autoincrement())
   projectId       Int         
   name            String      @unique
-  desciption      String
+  description      String
   isActive        Boolean     @default(true)
+  isArchived      Boolean     @default(false)
   isModified      Boolean     @default(false)
   isDeleted       Boolean     @default(false)
   createdAt       DateTime    @default(now())
-  updatedAt       DateTime   
+  updatedAt       DateTime?   
 
   project         Project     @relation(fields: [projectId], references:[id])
 }

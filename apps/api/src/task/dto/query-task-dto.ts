@@ -2,7 +2,7 @@ import { IsOptional, IsBoolean, IsString, IsInt, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class QueryProjectDto {
+export class QueryTaskDto {
     @ApiPropertyOptional({
         description: 'Filter by active status',
         example: true,
@@ -22,7 +22,7 @@ export class QueryProjectDto {
     archive?: boolean;
 
     @ApiPropertyOptional({
-        description: 'Search by project name',
+        description: 'Search by task name',
         example: 'ecommerce',
     })
     @IsOptional()
@@ -30,7 +30,7 @@ export class QueryProjectDto {
     search?: string;
 
     @ApiPropertyOptional({
-        description: 'Sort by project name',
+        description: 'Sort by task name',
         example: 'ecommerce',
     })
     @IsOptional()

@@ -1,9 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
+import { CreateTaskDTO, UpdateTaskDTO } from 'src/task/dto';
 
 @Injectable()
-export class ProjectService {
+export class TaskService {
     constructor(private readonly prisma: PrismaService) { }
+
+    async create(data: CreateTaskDTO) {
+        return await this.prisma.task.create({ data: data })
+    }
+
+    async update(id: number, data: UpdateTaskDTO) {
+        return await this.prisma.task.update({
+            where: {
+                id: id,
+                isActive: true,
+                isArchived: false
+            },
+            data: {
+                ...data,
+                isModified: true,
+                updatedAt: new Date()
+            }
+        })
+    }
+
+    async archive(id: number) {
+        return await this.prisma.task.update({
+            where: {
+                id: id,
+                isActive: true,
+                isArchived: false
+            },
+            data: {
+                isArchived: true
+            }
+        })
+    }
 
     async getAll(query?: {
         archive?: boolean,
@@ -13,7 +46,7 @@ export class ProjectService {
         page?: number;
         limit?: number;
     }) {
-        var where: any = {
+        const where: any = {
             isActive: true,
             isArchived: false
         }
@@ -23,7 +56,7 @@ export class ProjectService {
         }
 
         if (typeof query?.active === 'boolean') {
-            where.isActive = query.active;
+            where.isActive = query.active
         }
 
         if (typeof query?.archive === 'boolean') {
@@ -32,9 +65,10 @@ export class ProjectService {
 
         if (query?.search) {
             where.name = {
-                contains: query.search,
+                contains: query.search
             }
         }
+
         if (query?.sort) {
             orderBy.createdAt = query.sort
         }
@@ -44,13 +78,13 @@ export class ProjectService {
         const skip = (page - 1) * limit;
 
         const [data, total] = await Promise.all([
-            this.prisma.project.findMany({
+            this.prisma.task.findMany({
                 where,
                 orderBy,
                 skip,
                 take: limit,
             }),
-            this.prisma.project.count({ where }),
+            this.prisma.task.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -67,74 +101,25 @@ export class ProjectService {
     }
 
     async get(id: number) {
-        return await this.prisma.project.findUnique({
+        return this.prisma.task.findFirst({
             where: {
                 id: id,
                 isActive: true,
                 isArchived: false
-            }
-        })
-    }
-
-    async create(data: any) {
-        return await this.prisma.project.create({
-            data: data
-        })
-    }
-
-    async update(id: number, data: any) {
-        return await this.prisma.project.update({
-            where: {
-                id: id,
-                isActive: true,
-                isArchived: false
-            },
-            data: {
-                ...data,
-                updatedAt: new Date()
-            }
-        })
-    }
-
-    async archive(id: number) {
-        return await this.prisma.project.update({
-            where: {
-                id: id,
-                isActive: true,
-                isArchived: false
-            },
-            data: {
-                isArchived: true
             }
         })
     }
 
     async delete(id: number) {
-        const project = await this.prisma.project.findUnique({
-            where: { id },
-            include: { tasks: true },
-        });
-
-        if (!project || !project.isActive) {
-            throw new Error('Project not found or already inactive');
-        }
-
-        // 2️⃣ Prevent deletion if it has tasks
-        if (project.tasks && project.tasks.length > 0) {
-            throw new Error('Cannot delete project because it has associated tasks');
-        }
-
-        return await this.prisma.project.update({
+        return this.prisma.task.update({
             where: {
                 id: id,
-                isActive: true,
                 isArchived: false
             },
             data: {
                 isActive: false,
-                isDeleted: true,
+                isDeleted: true
             }
         })
     }
-
 }
