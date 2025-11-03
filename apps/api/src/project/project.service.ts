@@ -8,6 +8,7 @@ export class ProjectService {
     async getAll(query?: {
         archive?: boolean,
         active?: boolean,
+        userId?: number,
         search?: string,
         sort?: string,
         page?: number;
@@ -28,6 +29,10 @@ export class ProjectService {
 
         if (typeof query?.archive === 'boolean') {
             where.isArchived = query.archive;
+        }
+
+        if (query?.userId) {
+            where.userId = query.userId;
         }
 
         if (query?.search) {
@@ -76,7 +81,7 @@ export class ProjectService {
         })
     }
 
-    async create(data: any) {
+    async create(data: any & { userId: number }) {
         return await this.prisma.project.create({
             data: data
         })
@@ -104,6 +109,7 @@ export class ProjectService {
                 isArchived: false
             },
             data: {
+                isActive: false,
                 isArchived: true
             }
         })

@@ -4,7 +4,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from
 export class CreateTaskDTO {
     @ApiProperty({
         description: "Project Id",
-        example: 'Project id in which the task is being created',
+        example: 1,
     })
     @IsNumber()
     @IsNotEmpty({ message: "Project Id is required" })
@@ -12,7 +12,7 @@ export class CreateTaskDTO {
 
     @ApiProperty({
         description: "Task name",
-        example: 'A full-featured e-commerce platform with payment integration',
+        example: 'User Authentication Module',
         minLength: 3,
         maxLength: 100,
     })
@@ -24,7 +24,7 @@ export class CreateTaskDTO {
 
     @ApiProperty({
         description: 'Task description',
-        example: 'A full-featured e-commerce platform with payment integration',
+        example: 'Implement user authentication with JWT tokens',
         minLength: 10,
         maxLength: 500,
     })

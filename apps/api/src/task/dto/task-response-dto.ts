@@ -6,11 +6,19 @@ export class TaskResponseDto {
     @Expose()
     id: number;
 
-    @ApiProperty({ example: 'E-commerce Platform' })
+    @ApiProperty({ example: 1 })
+    @Expose()
+    userId: number;
+
+    @ApiProperty({ example: 1 })
+    @Expose()
+    projectId: number;
+
+    @ApiProperty({ example: 'User Authentication Module' })
     @Expose()
     name: string;
 
-    @ApiProperty({ example: 'A full-featured e-commerce platform' })
+    @ApiProperty({ example: 'Implement user authentication with JWT tokens' })
     @Expose()
     description: string;
 
@@ -31,6 +39,9 @@ export class TaskResponseDto {
 
     @Exclude()
     isModified: boolean;
+
+    @Exclude()
+    isArchived: boolean;
 
     constructor(partial: Partial<TaskResponseDto>) {
         Object.assign(this, partial);

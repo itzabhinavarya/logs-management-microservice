@@ -6,6 +6,10 @@ export class ProjectResponseDto {
   @Expose()
   id: number;
 
+  @ApiProperty({ example: 1 })
+  @Expose()
+  userId: number;
+
   @ApiProperty({ example: 'E-commerce Platform' })
   @Expose()
   name: string;
@@ -31,6 +35,9 @@ export class ProjectResponseDto {
 
   @Exclude()
   isModified: boolean;
+
+  @Exclude()
+  isArchived: boolean;
 
   constructor(partial: Partial<ProjectResponseDto>) {
     Object.assign(this, partial);

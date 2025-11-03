@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { DashboardController } from './dashboard.controller';
 import { DashboardService } from './dashboard.service';
-import { LoggerClient } from 'src/infrastructure/logger.client';
+import { LoggerModule } from 'src/infrastructure/logger.module';
 
 @Module({
+  imports: [LoggerModule],
   controllers: [DashboardController],
-  providers: [DashboardService, LoggerClient]
+  providers: [DashboardService]
 })
 export class DashboardModule { }
