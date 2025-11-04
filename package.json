@@ -1,7 +1,7 @@
 {
-  "name": "enterprise-microservice",
+  "name": "taskopedia",
   "version": "1.0.0",
-  "description": "Enterprise-grade microservices architecture with NestJS, Prisma, and centralized logging",
+  "description": "TaskOPedia - Enterprise-grade task and project management microservices architecture with NestJS, Prisma, and JWT authentication",
   "main": "index.js",
   "private": true,
   "scripts": {
@@ -31,9 +31,13 @@
     "postinstall": "turbo run db:generate --filter=api"
   },
   "keywords": [
+    "taskopedia",
+    "task-management",
+    "project-management",
     "microservices",
     "nestjs",
     "prisma",
+    "jwt-authentication",
     "monorepo",
     "pnpm-workspace",
     "api-gateway",

@@ -1,6 +1,6 @@
-# Logs Management Microservice
+# TaskOPedia
 
-Enterprise-grade microservices architecture with centralized logging, built using NestJS, Prisma, and Turborepo.
+Enterprise-grade task and project management microservices architecture, built using NestJS, Prisma, and Turborepo.
 
 📋 **[View Feature Roadmap](ROADMAP.md)** - Track upcoming features and implementation progress
 
@@ -68,7 +68,7 @@ pnpm run start:all
 ## 📦 Project Structure
 
 ```
-logs-management-microservice/
+taskopedia/
 ├── apps/
 │   ├── api/          # API service with Prisma
 │   ├── gateway/      # API Gateway

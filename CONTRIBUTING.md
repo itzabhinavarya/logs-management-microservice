@@ -6,8 +6,8 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 1. **Fork and Clone**
    ```bash
-   git clone https://github.com/your-username/logs-management-microservice.git
-   cd logs-management-microservice
+   git clone https://github.com/your-username/taskopedia.git
+   cd taskopedia
    ```
 
 2. **Install Dependencies**
