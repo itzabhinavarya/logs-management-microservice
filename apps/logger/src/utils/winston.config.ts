@@ -12,7 +12,7 @@ const baseTransports: any[] = [
 // Conditionally add CloudWatch transport
 if (enableCloudWatch) {
     const cloudWatchConfig: any = {
-        logGroupName: '/microservices/logger',
+        logGroupName: process.env.LOG_GROUP_NAME ||'/microservices/logger',
         logStreamName: process.env.LOG_STREAM_NAME || `logger-${process.env.NODE_ENV || 'dev'}`,
         awsRegion: process.env.AWS_REGION,
         jsonMessage: true,

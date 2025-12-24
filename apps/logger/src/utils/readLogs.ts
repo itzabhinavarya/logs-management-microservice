@@ -29,7 +29,7 @@ export async function getLogs() {
     try {
         // First, get the log streams
         const streams = await client.send(new DescribeLogStreamsCommand({
-            logGroupName: '/microservices/logger',
+            logGroupName: process.env.LOG_GROUP_NAME || '/microservices/logger',
             orderBy: 'LastEventTime',
             descending: true,
         }));
@@ -39,7 +39,7 @@ export async function getLogs() {
             const streamName = streams.logStreams[0].logStreamName;
 
             const logs = await client.send(new GetLogEventsCommand({
-                logGroupName: '/microservices/logger',
+                logGroupName: process.env.LOG_GROUP_NAME || '/microservices/logger',
                 logStreamName: streamName,
                 startFromHead: false, // Start from the end (newest logs)
             }));

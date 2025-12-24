@@ -127,6 +127,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION:-eu-west-2}
       - LOG_STREAM_NAME=${LOG_STREAM_NAME:-logger-production}
+      - LOG_GROUP_NAME=${LOG_GROUP_NAME:-/microservices/logger}
     # Logger port not exposed - only accessible from internal network
     # ports:
     #   - "${LOGGER_PORT:-4001}:4001"
